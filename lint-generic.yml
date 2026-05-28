@@ -1,0 +1,22 @@
+---
+include:
+  - remote: "https://raw.githubusercontent.com/jobtome-labs/ci-templates/v3.47.0/templates/lint.yml"
+
+lint:
+  extends: .lint
+
+  image: "${CI_REGISTRY_IMAGE}/${APP_LINT_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+  variables:
+    GIT_STRATEGY: none
+    APP_LINT_COMMAND_DEFAULT: ">&2 echo 'ERROR: APP_LINT_COMMAND Variable not set. Please set the Linting Command to be executed by this Job.' ; exit 1"
+
+  script:
+    - COMMAND="${APP_LINT_COMMAND_DEFAULT}"
+
+    - |
+      if [ -n "${APP_LINT_COMMAND}" ]; then
+        COMMAND="${APP_LINT_COMMAND}"
+      fi
+
+    - eval "${COMMAND}"

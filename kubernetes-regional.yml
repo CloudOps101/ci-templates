@@ -1,0 +1,81 @@
+include:
+  - remote: 'https://raw.githubusercontent.com/jobtome-labs/ci-templates/v3.47.0/kubernetes-quality.yml'
+
+deploy:production:image:
+  extends: .deploy:image
+  variables:
+    GOOGLE_KEY: ${GOOGLE_KEY_PRODUCTION}
+    CLUSTER_NAME: ${CLUSTER_NAME_PRODUCTION}
+    CLUSTER_ZONE: ${CLUSTER_ZONE_PRODUCTION}
+    DOMAIN: ${DOMAIN_PRODUCTION}
+    SECRET_YAML: ${SECRET_YAML_PRODUCTION}
+    NAMESPACE: ${NAMESPACE_PRODUCTION}
+    ENVIRONMENT: production
+    ENVIRONMENT_NAME: production
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_PRODUCTION" "CLUSTER_NAME_PRODUCTION" "CLUSTER_ZONE_PRODUCTION"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  only:
+    - /^v.+$/i
+  except:
+    - branches
+  environment:
+    name: ${ENVIRONMENT_NAME}
+    url: https://${DOMAIN}
+
+deploy:production:manifest:
+  extends: .deploy:manifest
+  variables:
+    GOOGLE_KEY: ${GOOGLE_KEY_PRODUCTION}
+    CLUSTER_NAME: ${CLUSTER_NAME_PRODUCTION}
+    CLUSTER_ZONE: ${CLUSTER_ZONE_PRODUCTION}
+    DOMAIN: ${DOMAIN_PRODUCTION}
+    SECRET_YAML: ${SECRET_YAML_PRODUCTION}
+    NAMESPACE: ${NAMESPACE_PRODUCTION}
+    ENVIRONMENT: production
+    ENVIRONMENT_NAME: production
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_PRODUCTION" "CLUSTER_NAME_PRODUCTION" "CLUSTER_ZONE_PRODUCTION"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  when: manual
+  only:
+    - /^v.+$/i
+  except:
+    - branches
+  environment:
+    name: ${ENVIRONMENT_NAME}
+    url: https://${DOMAIN}
+
+rollback:production:
+  extends: .rollback
+  variables:
+    GOOGLE_KEY: ${GOOGLE_KEY_PRODUCTION}
+    CLUSTER_NAME: ${CLUSTER_NAME_PRODUCTION}
+    CLUSTER_ZONE: ${CLUSTER_ZONE_PRODUCTION}
+    NAMESPACE: ${NAMESPACE_PRODUCTION}
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_PRODUCTION" "CLUSTER_NAME_PRODUCTION" "CLUSTER_ZONE_PRODUCTION"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  when: on_failure
+  only:
+    - /^v.+$/i
+  except:
+    - branches

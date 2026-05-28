@@ -1,0 +1,20 @@
+lint:php:
+  stage: lint
+  image: europe-west1-docker.pkg.dev/jobtome-platform/public/cytopia-phplint:7.3
+  script:
+    - |
+
+      echo
+      echo "-> Linting code:"
+      echo
+
+      #molto elegante..
+      /docker-entrypoint.sh *.php
+
+      echo
+      echo "-> Code checked!"
+      echo
+  except:
+    variables:
+      - $SKIP_CI_LINT == "true"
+      - $CI_FAST_TRACK == "true"

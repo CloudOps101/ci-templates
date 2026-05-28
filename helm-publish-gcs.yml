@@ -1,0 +1,67 @@
+---
+helm:publish:gcs:
+  image: europe-west1-docker.pkg.dev/jobtome-platform/public/gitlab-ci-tools:v1.0.0
+
+  stage: push
+
+  script:
+    - |
+      set -e
+
+      # VALIDATING VARIABLES
+
+      for var in "GOOGLE_PROJECT" "BUCKET_NAME" "GOOGLE_KEY"; do
+        if [ -z "${!var}" ]; then
+          echo
+          echo "[ERROR] Required Variable Not Set: \"${var}\"!"
+          echo
+
+          exit 1
+        fi
+      done
+
+      echo
+      echo "[INFO] All Required Variables Set."
+      echo
+
+      # GOOGLE AUTHENTICATION
+
+      echo "${GOOGLE_KEY}" > /tmp/key.json
+      gcloud auth activate-service-account --key-file /tmp/key.json
+      gcloud config set project "${GOOGLE_PROJECT}"
+
+      # PACKAGE AND PUSH HELM CHART TO GOOGLE STORAGE BUCKET
+
+      COMMAND=( gsutil )
+
+      if [ -z "${BUCKET_PATH+x}" ]; then
+        BUCKET_PATH="charts"
+      fi
+
+      if [ -n "${BUCKET_HEADERS}" ]; then
+        COMMAND+=( -h "${BUCKET_HEADERS}" )
+      fi
+
+      BUCKET_FULL_PATH="gs:/$(echo "/${BUCKET_NAME}/${BUCKET_PATH}/" | tr -s /)"
+
+      echo
+      echo "[INFO] Google Storage Bucket Push Path: \"${BUCKET_FULL_PATH}\"."
+      echo
+
+      "${COMMAND[@]}" cp ${BUCKET_FULL_PATH}index.yaml /tmp/index.yaml || touch /tmp/index.yaml
+
+      helm package .
+
+      helm repo index . --merge /tmp/index.yaml
+
+      "${COMMAND[@]}" cp ./index.yaml ${BUCKET_FULL_PATH}index.yaml
+      "${COMMAND[@]}" cp ./*.tgz* ${BUCKET_FULL_PATH}
+
+      echo
+      echo "[INFO] Helm Chart Successfully Pushed to Google Storage Bucket."
+      echo
+
+  only:
+    - /^v.+$/i
+  except:
+    - branches

@@ -1,0 +1,39 @@
+---
+include:
+  - remote: "https://raw.githubusercontent.com/jobtome-labs/ci-templates/v3.47.0/templates/endpoints.yml"
+
+endpoints:validate:quality:
+  extends: .endpoints:validate
+
+  stage: test
+
+  variables:
+    ENDPOINTS_HOST: ${QUALITY_ENDPOINTS_HOST}
+    ENDPOINTS_TITLE: ${QUALITY_ENDPOINTS_TITLE}
+
+  only:
+    - merge_requests
+    - master
+    - main
+
+  except:
+    variables:
+      - $CI_FAST_TRACK == "true"
+
+endpoints:deploy:quality:
+  extends: .endpoints:deploy
+
+  stage: deploy
+
+  variables:
+    ENDPOINTS_HOST: ${QUALITY_ENDPOINTS_HOST}
+    ENDPOINTS_TITLE: ${QUALITY_ENDPOINTS_TITLE}
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ "/^qa-.+$/i") && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master") && ($CI_PIPELINE_SOURCE == "merge_request_event")
+    - if: ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ "/^qa-.+$/i") && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master") && ($CI_PIPELINE_SOURCE == "parent_pipeline")
+
+  environment:
+    name: quality
+    url: ${QUALITY_ENDPOINTS_HOST}

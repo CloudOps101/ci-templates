@@ -1,0 +1,22 @@
+---
+include:
+  - remote: "https://raw.githubusercontent.com/jobtome-labs/ci-templates/v3.47.0/templates/test-unit.yml"
+
+test:unit:
+  extends: .test:unit
+
+  image: "${CI_REGISTRY_IMAGE}/${APP_TEST_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+  variables:
+    GIT_STRATEGY: none
+    APP_TEST_UNIT_COMMAND_DEFAULT: ">&2 echo 'ERROR: APP_TEST_UNIT_COMMAND Variable not set. Please set the Unit Tests Command to be executed by this Job.' ; exit 1"
+
+  script:
+    - COMMAND="${APP_TEST_UNIT_COMMAND_DEFAULT}"
+
+    - |
+      if [ -n "${APP_TEST_UNIT_COMMAND}" ]; then
+        COMMAND="${APP_TEST_UNIT_COMMAND}"
+      fi
+
+    - eval "${COMMAND}"

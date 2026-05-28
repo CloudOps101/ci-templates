@@ -1,0 +1,86 @@
+include:
+  - remote: 'https://raw.githubusercontent.com/jobtome-labs/ci-templates/v3.47.0/serverless-quality.yml'
+
+# EUROPE
+deploy:production:europe:
+  extends: .serverless:deploy
+  variables:
+    GOOGLE_KEY: ${GOOGLE_KEY_PRODUCTION_EUROPE}
+    FUNCTION_NAME: ${FUNCTION_NAME_PRODUCTION_EUROPE}
+    SERVICE_ACCOUNT: ${SERVICE_ACCOUNT_PRODUCTION_EUROPE}
+    REGION: ${REGION_PRODUCTION_EUROPE}
+    DOMAIN: ${DOMAIN_PRODUCTION_EUROPE}
+    ENVIRONMENT: production-europe
+    TRIGGER_TOPIC: ${TRIGGER_TOPIC_PRODUCTION_EUROPE}
+    SECRET_YAML: ${SECRET_YAML_PRODUCTION_EUROPE}
+    SECRET_ENV_LIST: ${SECRET_ENV_LIST_PRODUCTION_EUROPE}
+    SECRET_MGR_LIST: ${SECRET_MGR_LIST_PRODUCTION_EUROPE}
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_PRODUCTION_EUROPE" "REGION_PRODUCTION_EUROPE"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  only:
+    - /^v.+$/i
+  except:
+    - branches
+
+# AMERICA
+deploy:production:america:
+  extends: .serverless:deploy
+  variables:
+    GOOGLE_KEY: ${GOOGLE_KEY_PRODUCTION_AMERICA}
+    FUNCTION_NAME: ${FUNCTION_NAME_PRODUCTION_AMERICA}
+    SERVICE_ACCOUNT: ${SERVICE_ACCOUNT_PRODUCTION_AMERICA}
+    REGION: ${REGION_PRODUCTION_AMERICA}
+    DOMAIN: ${DOMAIN_PRODUCTION_AMERICA}
+    ENVIRONMENT: production-america
+    TRIGGER_TOPIC: ${TRIGGER_TOPIC_PRODUCTION_AMERICA}
+    SECRET_YAML: ${SECRET_YAML_PRODUCTION_AMERICA}
+    SECRET_ENV_LIST: ${SECRET_ENV_LIST_PRODUCTION_AMERICA}
+    SECRET_MGR_LIST: ${SECRET_MGR_LIST_PRODUCTION_AMERICA}
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_PRODUCTION_AMERICA" "REGION_PRODUCTION_AMERICA"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  only:
+    - /^v.+$/i
+  except:
+    - branches
+
+# ASIA
+deploy:production:asia:
+  extends: .serverless:deploy
+  variables:
+    GOOGLE_KEY: ${GOOGLE_KEY_PRODUCTION_ASIA}
+    FUNCTION_NAME: ${FUNCTION_NAME_PRODUCTION_ASIA}
+    SERVICE_ACCOUNT: ${SERVICE_ACCOUNT_PRODUCTION_ASIA}
+    REGION: ${REGION_PRODUCTION_ASIA}
+    DOMAIN: ${DOMAIN_PRODUCTION_ASIA}
+    ENVIRONMENT: production-asia
+    TRIGGER_TOPIC: ${TRIGGER_TOPIC_PRODUCTION_ASIA}
+    SECRET_YAML: ${SECRET_YAML_PRODUCTION_ASIA}
+    SECRET_ENV_LIST: ${SECRET_ENV_LIST_PRODUCTION_ASIA}
+    SECRET_MGR_LIST: ${SECRET_MGR_LIST_PRODUCTION_ASIA}
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_PRODUCTION_ASIA" "REGION_PRODUCTION_ASIA"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  only:
+    - /^v.+$/i
+  except:
+    - branches

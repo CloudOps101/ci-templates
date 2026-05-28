@@ -1,0 +1,24 @@
+include:
+  - remote: "https://raw.githubusercontent.com/jobtome-labs/ci-templates/v3.47.0/templates/kubernetes-task.yml"
+
+task:quality:
+  extends: .task
+  variables:
+    NAMESPACE: ${NAMESPACE_QUALITY}
+    GOOGLE_KEY: ${GOOGLE_KEY_QUALITY}
+    CLUSTER_NAME: ${CLUSTER_NAME_QUALITY}
+    CLUSTER_ZONE: ${CLUSTER_ZONE_QUALITY}
+    KUBERNETES_SCRIPT: ${KUBERNETES_SCRIPT_QUALITY}
+  before_script:
+    - |
+      # CHECK VARIABLES PHASE
+      for var in "GOOGLE_KEY_QUALITY" "CLUSTER_NAME_QUALITY" "CLUSTER_ZONE_QUALITY" "KUBERNETES_SCRIPT_QUALITY"; do
+          if [ -z "${!var}" ]; then
+            echo "Missing '${var}' variable!"
+            exit 1
+          fi
+      done
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ "/^qa-.+$/i") && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master") && ($CI_PIPELINE_SOURCE == "merge_request_event")
+    - if: ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ "/^qa-.+$/i") && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master") && ($CI_PIPELINE_SOURCE == "parent_pipeline")

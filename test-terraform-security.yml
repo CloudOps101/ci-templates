@@ -1,0 +1,22 @@
+---
+test:terraform-security:
+  extends: .terraform-security
+
+  stage: test
+
+  script:
+    - |
+      if [ -n "${TF_FOLDER_PATH}" ]; then
+        cd "${TF_FOLDER_PATH}"
+      fi
+
+      terraform --version
+
+      terraform init -backend=false
+
+      tfsec .
+
+  only:
+    - /^v.+$/i
+    - master
+    - merge_requests
